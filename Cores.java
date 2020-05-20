@@ -10,7 +10,27 @@ public class Cores {
     List<float[]> clientEntries = new ArrayList<>(); // Contains the client request entries read from the input file.
     int[] coreDenominations;
 
+    float[][] profitMarginTable = new float[clientEntries.size() + 1][totalCores + 1];
+
+
     Cores(String inputFileDir) {
+        // initialize profitMarginTable with -1.
+        for (int i = 0; i < this.profitMarginTable.length; i++) {
+            for (int j = 0; j < this.totalCores; j++) {
+                this.profitMarginTable[i][j] = -1;
+            }
+        }
+
+        // Set profitMarginTable's row 0 elements to 0.
+        for (int j = 0; j < this.profitMarginTable[0].length; j++) {
+            this.profitMarginTable[0][j] = 0;
+        }
+
+        // Set profitMarginTable's column 0 elements to 0.
+        for (int i = 0; i < this.profitMarginTable.length; i++) {
+            this.profitMarginTable[i][0] = 0;
+        }
+
         // Check if loadFile() successfully read the specified input file.
         // If so, call findShortestPath().
         if (loadFile(inputFileDir)) {
@@ -69,7 +89,6 @@ public class Cores {
     }
 
     public int[] calculateVMPerClient() {
-        int remainingCores = this.totalCores;
         int maxCoreRequirement = 0;
 
         for (float[] entry : clientEntries) {
@@ -95,6 +114,21 @@ public class Cores {
         return vmCoreDistribution;
     }
 
+    public float calculateMaxProfit(int clientsAmount, int availableCores) {
+        if (this.profitMarginTable[clientsAmount][availableCores] < 0) {
+            float value;
+            if (availableCores < clientEntries.get(clientsAmount)[0]) {
+                value = calculateMaxProfit(clientsAmount - 1, availableCores);
+            } else {
+                value = Math.max(calculateMaxProfit(clientsAmount - 1, availableCores),
+                        clientEntries.get(clientsAmount)[1] + calculateMaxProfit(clientsAmount - 1,
+                                Math.round(availableCores - clientEntries.get(clientsAmount)[0])));
+            }
+            this.profitMarginTable[clientsAmount][availableCores] = value;
+        }
+        return this.profitMarginTable[clientsAmount][availableCores];
+    }
+
     public static void main(String[] args) {
         Cores cores = new Cores(args[0]);
         int[] result = cores.calculateVMPerClient();
@@ -114,4 +148,5 @@ public class Cores {
         System.out.println("Client 8: " + result[500]);
         System.out.println("Client 9: " + result[637]);
     }
+    
 }
