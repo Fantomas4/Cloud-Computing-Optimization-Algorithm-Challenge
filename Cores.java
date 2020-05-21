@@ -27,6 +27,17 @@ public class Cores {
 
         this.profitMarginTable = new float[clientEntries.size() + 1][totalCores + 1];
 
+//        //test!!!
+//        this.clientEntries.add(new float[]{2, 12});
+//        this.clientEntries.add(new float[]{1, 10});
+//        this.clientEntries.add(new float[]{3, 20});
+//        this.clientEntries.add(new float[]{2, 15});
+//
+//        this.totalCores = 5;
+//
+//        this.profitMarginTable = new float[clientEntries.size() + 1][totalCores + 1];
+//        /// end test!
+
         // initialize profitMarginTable with -1.
         for (int i = 0; i < this.profitMarginTable.length; i++) {
             for (int j = 0; j < this.profitMarginTable[0].length; j++) {
@@ -122,30 +133,28 @@ public class Cores {
                 value = calculateMaxProfit(clientsAmount - 1, availableCores);
             } else {
                 value = Math.max(calculateMaxProfit(clientsAmount - 1, availableCores),
-                        clientEntries.get(clientsAmount - 1)[1] + calculateMaxProfit(clientsAmount - 1,
-                                Math.round(availableCores - clientEntries.get(clientsAmount - 1)[0])));
+                        (clientEntries.get(clientsAmount - 1)[1] * clientEntries.get(clientsAmount -1)[0]) +
+                                calculateMaxProfit(clientsAmount - 1, Math.round(availableCores -
+                                        clientEntries.get(clientsAmount - 1)[0])));
             }
-            System.out.println("before: " + this.profitMarginTable[clientsAmount][availableCores]);
             this.profitMarginTable[clientsAmount][availableCores] = value;
-            System.out.println("after: " + this.profitMarginTable[clientsAmount][availableCores]);
-
         }
 
 
-        // test!!!
-        System.out.println("i: " + clientsAmount);
-        System.out.println("j: " + availableCores);
-        System.out.println("rows: " + profitMarginTable.length);
-        System.out.println("cols: " + profitMarginTable[0].length);
-
-        for (int i = 0; i < profitMarginTable.length; i++) {
-            for (int j = 0; j < profitMarginTable[0].length; j++) {
-                System.out.printf("%f ", profitMarginTable[i][j]);
-            }
-            System.out.println();
-        }
-        System.out.println("=================================================");
-        // end test!!!
+//        // test!!!
+//        System.out.println("i: " + clientsAmount);
+//        System.out.println("j: " + availableCores);
+//        System.out.println("rows: " + profitMarginTable.length);
+//        System.out.println("cols: " + profitMarginTable[0].length);
+//
+//        for (int i = 0; i < profitMarginTable.length; i++) {
+//            for (int j = 0; j < profitMarginTable[0].length; j++) {
+//                System.out.printf("%f ", profitMarginTable[i][j]);
+//            }
+//            System.out.println();
+//        }
+//        System.out.println("=================================================");
+//        // end test!!!
 
 
         return this.profitMarginTable[clientsAmount][availableCores];
@@ -160,15 +169,15 @@ public class Cores {
 //        for (int res : result) {
 //            System.out.println(res);
 //        }
-        System.out.println("Client 1: " + result[1100]);
-        System.out.println("Client 2: " + result[1000]);
-        System.out.println("Client 3: " + result[21]);
-        System.out.println("Client 4: " + result[50]);
-        System.out.println("Client 5: " + result[49]);
-        System.out.println("Client 6: " + result[15]);
-        System.out.println("Client 7: " + result[11010]);
-        System.out.println("Client 8: " + result[500]);
-        System.out.println("Client 9: " + result[637]);
+//        System.out.println("Client 1: " + result[1100]);
+//        System.out.println("Client 2: " + result[1000]);
+//        System.out.println("Client 3: " + result[21]);
+//        System.out.println("Client 4: " + result[50]);
+//        System.out.println("Client 5: " + result[49]);
+//        System.out.println("Client 6: " + result[15]);
+//        System.out.println("Client 7: " + result[11010]);
+//        System.out.println("Client 8: " + result[500]);
+//        System.out.println("Client 9: " + result[637]);
 
         System.out.println(cores.calculateMaxProfit(cores.clientEntries.size(), cores.totalCores));
     }
