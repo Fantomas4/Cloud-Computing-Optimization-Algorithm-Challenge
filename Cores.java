@@ -8,51 +8,37 @@ public class Cores {
 
     int totalCores;
     List<float[]> clientEntries = new ArrayList<>(); // Contains the client request entries read from the input file.
-    int[] coreDenominations;
-
-    float[][] profitMarginTable;
-
+    int[] coreDenominations; // Contains the available core denominations (possible numbers of cores per VM).
+    float[][] profitMarginTable; // Table used to implement the memory function method for the knapsack problem.
+    int[] vmDistributionResults; // Array that contains the minimum amount of VMs required for every core request
+                                 // made by the clients.
+    double maxProfitMargin; // Holds the value of the maximum profit that could be made if the available cores where
+                            // distributed to the clients in the most profitable way possible.
 
     Cores(String inputFileDir) {
         // Check if loadFile() successfully read the specified input file.
         if (loadFile(inputFileDir)) {
-            System.out.println("Total Cores: " + totalCores);
-            for (float[] entry : clientEntries) {
-                System.out.printf("%f %f\n", entry[0], entry[1]);
+            this.coreDenominations = new int[]{1,2,7,11};
+            this.profitMarginTable = new float[clientEntries.size() + 1][totalCores + 1];
 
+            // Initialize profitMarginTable with -1.
+            for (int i = 0; i < this.profitMarginTable.length; i++) {
+                for (int j = 0; j < this.profitMarginTable[0].length; j++) {
+                    this.profitMarginTable[i][j] = -1;
+                }
             }
-        }
 
-        this.coreDenominations = new int[]{1,2,7,11};
-
-        this.profitMarginTable = new float[clientEntries.size() + 1][totalCores + 1];
-
-//        //test!!!
-//        this.clientEntries.add(new float[]{2, 12});
-//        this.clientEntries.add(new float[]{1, 10});
-//        this.clientEntries.add(new float[]{3, 20});
-//        this.clientEntries.add(new float[]{2, 15});
-//
-//        this.totalCores = 5;
-//
-//        this.profitMarginTable = new float[clientEntries.size() + 1][totalCores + 1];
-//        /// end test!
-
-        // initialize profitMarginTable with -1.
-        for (int i = 0; i < this.profitMarginTable.length; i++) {
+            // Set profitMarginTable's row 0 elements to 0.
             for (int j = 0; j < this.profitMarginTable[0].length; j++) {
-                this.profitMarginTable[i][j] = -1;
+                this.profitMarginTable[0][j] = 0;
             }
-        }
 
-        // Set profitMarginTable's row 0 elements to 0.
-        for (int j = 0; j < this.profitMarginTable[0].length; j++) {
-            this.profitMarginTable[0][j] = 0;
-        }
-
-        // Set profitMarginTable's column 0 elements to 0.
-        for (int i = 0; i < this.profitMarginTable.length; i++) {
-            this.profitMarginTable[i][0] = 0;
+            // Set profitMarginTable's column 0 elements to 0.
+            for (int i = 0; i < this.profitMarginTable.length; i++) {
+                this.profitMarginTable[i][0] = 0;
+            }
+            
+            executeOperations();
         }
     }
 
@@ -100,7 +86,7 @@ public class Cores {
         }
     }
 
-    public int[] calculateVMPerClient() {
+    private int[] calculateVMsPerClient() {
         int maxCoreRequirement = 0;
 
         for (float[] entry : clientEntries) {
@@ -126,7 +112,7 @@ public class Cores {
         return vmCoreDistribution;
     }
 
-    public float calculateMaxProfit(int clientsAmount, int availableCores) {
+    private float calculateMaxProfit(int clientsAmount, int availableCores) {
         if (this.profitMarginTable[clientsAmount][availableCores] < 0) {
             float value;
             if (availableCores < clientEntries.get(clientsAmount - 1)[0]) {
@@ -140,46 +126,27 @@ public class Cores {
             this.profitMarginTable[clientsAmount][availableCores] = value;
         }
 
-
-//        // test!!!
-//        System.out.println("i: " + clientsAmount);
-//        System.out.println("j: " + availableCores);
-//        System.out.println("rows: " + profitMarginTable.length);
-//        System.out.println("cols: " + profitMarginTable[0].length);
-//
-//        for (int i = 0; i < profitMarginTable.length; i++) {
-//            for (int j = 0; j < profitMarginTable[0].length; j++) {
-//                System.out.printf("%f ", profitMarginTable[i][j]);
-//            }
-//            System.out.println();
-//        }
-//        System.out.println("=================================================");
-//        // end test!!!
-
-
         return this.profitMarginTable[clientsAmount][availableCores];
+    }
+
+    private void printResults() {
+
+        // Print the results of operation A
+        for (int i = 0; i < this.clientEntries.size(); i++) {
+            System.out.printf("Client %d: %d VMs\n", i + 1, this.vmDistributionResults[Math.round(this.clientEntries.get(i)[0])]);
+        }
+
+        // Print the result of operation B
+        System.out.printf("Total amount: %.3f", this.maxProfitMargin);
+    }
+
+    private void executeOperations() {
+        this.vmDistributionResults = calculateVMsPerClient();
+        this.maxProfitMargin = calculateMaxProfit(this.clientEntries.size(), this.totalCores);
+        printResults();
     }
 
     public static void main(String[] args) {
         Cores cores = new Cores(args[0]);
-        int[] result = cores.calculateVMPerClient();
-
-        System.out.println("=======================");
-
-//        for (int res : result) {
-//            System.out.println(res);
-//        }
-//        System.out.println("Client 1: " + result[1100]);
-//        System.out.println("Client 2: " + result[1000]);
-//        System.out.println("Client 3: " + result[21]);
-//        System.out.println("Client 4: " + result[50]);
-//        System.out.println("Client 5: " + result[49]);
-//        System.out.println("Client 6: " + result[15]);
-//        System.out.println("Client 7: " + result[11010]);
-//        System.out.println("Client 8: " + result[500]);
-//        System.out.println("Client 9: " + result[637]);
-
-        System.out.println(cores.calculateMaxProfit(cores.clientEntries.size(), cores.totalCores));
     }
-
 }
