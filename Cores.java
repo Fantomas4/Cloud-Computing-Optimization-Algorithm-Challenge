@@ -10,13 +10,26 @@ public class Cores {
     List<float[]> clientEntries = new ArrayList<>(); // Contains the client request entries read from the input file.
     int[] coreDenominations;
 
-    float[][] profitMarginTable = new float[clientEntries.size() + 1][totalCores + 1];
+    float[][] profitMarginTable;
 
 
     Cores(String inputFileDir) {
+        // Check if loadFile() successfully read the specified input file.
+        if (loadFile(inputFileDir)) {
+            System.out.println("Total Cores: " + totalCores);
+            for (float[] entry : clientEntries) {
+                System.out.printf("%f %f\n", entry[0], entry[1]);
+
+            }
+        }
+
+        this.coreDenominations = new int[]{1,2,7,11};
+
+        this.profitMarginTable = new float[clientEntries.size() + 1][totalCores + 1];
+
         // initialize profitMarginTable with -1.
         for (int i = 0; i < this.profitMarginTable.length; i++) {
-            for (int j = 0; j < this.totalCores; j++) {
+            for (int j = 0; j < this.profitMarginTable[0].length; j++) {
                 this.profitMarginTable[i][j] = -1;
             }
         }
@@ -30,18 +43,6 @@ public class Cores {
         for (int i = 0; i < this.profitMarginTable.length; i++) {
             this.profitMarginTable[i][0] = 0;
         }
-
-        // Check if loadFile() successfully read the specified input file.
-        // If so, call findShortestPath().
-        if (loadFile(inputFileDir)) {
-            System.out.println("Total Cores: " + totalCores);
-            for (float[] entry : clientEntries) {
-                System.out.printf("%f %f\n", entry[0], entry[1]);
-
-            }
-        }
-
-        this.coreDenominations = new int[]{1,2,7,11};
     }
 
     /**
@@ -117,15 +118,36 @@ public class Cores {
     public float calculateMaxProfit(int clientsAmount, int availableCores) {
         if (this.profitMarginTable[clientsAmount][availableCores] < 0) {
             float value;
-            if (availableCores < clientEntries.get(clientsAmount)[0]) {
+            if (availableCores < clientEntries.get(clientsAmount - 1)[0]) {
                 value = calculateMaxProfit(clientsAmount - 1, availableCores);
             } else {
                 value = Math.max(calculateMaxProfit(clientsAmount - 1, availableCores),
-                        clientEntries.get(clientsAmount)[1] + calculateMaxProfit(clientsAmount - 1,
-                                Math.round(availableCores - clientEntries.get(clientsAmount)[0])));
+                        clientEntries.get(clientsAmount - 1)[1] + calculateMaxProfit(clientsAmount - 1,
+                                Math.round(availableCores - clientEntries.get(clientsAmount - 1)[0])));
             }
+            System.out.println("before: " + this.profitMarginTable[clientsAmount][availableCores]);
             this.profitMarginTable[clientsAmount][availableCores] = value;
+            System.out.println("after: " + this.profitMarginTable[clientsAmount][availableCores]);
+
         }
+
+
+        // test!!!
+        System.out.println("i: " + clientsAmount);
+        System.out.println("j: " + availableCores);
+        System.out.println("rows: " + profitMarginTable.length);
+        System.out.println("cols: " + profitMarginTable[0].length);
+
+        for (int i = 0; i < profitMarginTable.length; i++) {
+            for (int j = 0; j < profitMarginTable[0].length; j++) {
+                System.out.printf("%f ", profitMarginTable[i][j]);
+            }
+            System.out.println();
+        }
+        System.out.println("=================================================");
+        // end test!!!
+
+
         return this.profitMarginTable[clientsAmount][availableCores];
     }
 
@@ -147,6 +169,8 @@ public class Cores {
         System.out.println("Client 7: " + result[11010]);
         System.out.println("Client 8: " + result[500]);
         System.out.println("Client 9: " + result[637]);
+
+        System.out.println(cores.calculateMaxProfit(cores.clientEntries.size(), cores.totalCores));
     }
-    
+
 }
