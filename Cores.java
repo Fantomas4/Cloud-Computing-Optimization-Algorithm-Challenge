@@ -86,9 +86,18 @@ public class Cores {
         }
     }
 
+    /**
+     * Calculates the minimum amount of VMs needed to satisfy each client's request (core number).
+     * Based on the "Coin Change" algorithm from the book "Introduction to The Design and
+     * Analysis of Algorithms - Anany Levitin"
+     * @return An array of integers that represents the minimum amount of VMs needed per core amount request.
+     * Each index of the array corresponds to an amount of cores requested, e.g. index 112 contains the minimum
+     * amount of VMs for a client request of 112 cores.
+     */
     private int[] calculateVMsPerClient() {
+        // Find the maximum number of cores requested
+        // in any of the client requests
         int maxCoreRequirement = 0;
-
         for (float[] entry : clientEntries) {
             int value = (Math.round(entry[0]));
             if (value > maxCoreRequirement) {
@@ -96,9 +105,11 @@ public class Cores {
             }
         }
 
+        // Create an integer array that will hold the results (minimum amount of VMs required)
+        // for every amount of cores requested. The array is of size maxCoreRequirement + 1, since
+        // index 0 is initialized with 0.
         int[] vmCoreDistribution = new int[maxCoreRequirement + 1];
         vmCoreDistribution[0] = 0;
-
         for (int i = 1; i <= maxCoreRequirement; i++) {
             int temp = maxCoreRequirement + 1;
             int j = 0;
@@ -112,6 +123,14 @@ public class Cores {
         return vmCoreDistribution;
     }
 
+    /**
+     * Calculates the maximum profit that can by achieved given a number of clients and the amount of available cores
+     * to be distributed. Based on the memory function method for the knapsack problem from the book "Introduction to The Design and
+     * Analysis of Algorithms - Anany Levitin".
+     * @param clientsAmount The amount of clients for which the calculation will be performed.
+     * @param availableCores The amount of cores available for distribution amongst the clients.
+     * @return A float number representing the maximum profit achieved.
+     */
     private float calculateMaxProfit(int clientsAmount, int availableCores) {
         if (this.profitMarginTable[clientsAmount][availableCores] < 0) {
             float value;
@@ -129,6 +148,10 @@ public class Cores {
         return this.profitMarginTable[clientsAmount][availableCores];
     }
 
+    /**
+     * Prints the results of operation A and operation B (calculateVMsPerClient() and calculateMaxProfit())
+     * in the format specified by the assignment's description.
+     */
     private void printResults() {
 
         // Print the results of operation A
@@ -140,6 +163,9 @@ public class Cores {
         System.out.printf("Total amount: %.3f", this.maxProfitMargin);
     }
 
+    /**
+     * Executes the necessary calculations by calling calculateVMsPerClient() and calculateMaxProfit()
+     */
     private void executeOperations() {
         this.vmDistributionResults = calculateVMsPerClient();
         this.maxProfitMargin = calculateMaxProfit(this.clientEntries.size(), this.totalCores);
