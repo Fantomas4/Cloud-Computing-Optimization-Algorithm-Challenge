@@ -160,7 +160,12 @@ public class Cores {
         }
 
         // Print the result of operation B
-        System.out.printf("Total amount: %.3f", this.maxProfitMargin);
+        String numberStr = String.format("%.3f", this.maxProfitMargin);
+
+        // replaceAll("0+$", "") uses regex to identify any number of 0s followed by end-of-string ($)
+        // and replace them with "" (thus removing them from the final string).
+        // For example, 52.720 -> 52.72
+        System.out.println("Total amount: " + numberStr.replaceAll("0+$", ""));
     }
 
     /**
